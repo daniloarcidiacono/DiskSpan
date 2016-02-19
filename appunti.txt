@@ -1,0 +1,10 @@
+http://www.or.deis.unibo.it/kp/Chapter6.pdf
+%MINGW_HOME%\libexec\gcc\mingw32\4.8.1
+mulknap(int n, int m, int *p, int *w, int *x, int *c)
+
+n: numero di oggetti
+m: numero di zaini
+p: profitto per oggetto (interi positivi)
+w: peso per oggetto (interi positivi)
+c: capacità per zaino (interi positivi)
+x: risultati
