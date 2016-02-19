@@ -1,9 +1,14 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "mulknap.h"
+#include <QApplication>
+#include "MainWindow.h"
 
 int main(int argc, char *argv[])
 {
-	printf("Hello, world!");
-	return 0;
+    Q_INIT_RESOURCE(application);
+
+    QApplication app(argc, argv);
+    app.setOrganizationName("QtProject");
+    app.setApplicationName("Application Example");
+    MainWindow mainWin;
+    mainWin.show();
+    return app.exec();
 }
