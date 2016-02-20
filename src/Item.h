@@ -33,6 +33,9 @@ public:
 	Item(QObject *parent = 0);
 	virtual ~Item();
 
+	// Returns true if the item contains an entry referring to the given absolute path.
+	bool hasEntryContainingPath(const QString &absPath) const;
+
 	// Add methods
 	void addEntry(ItemEntry *entry);
 

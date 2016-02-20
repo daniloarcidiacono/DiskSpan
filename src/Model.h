@@ -29,6 +29,9 @@ public:
 	// Resets the model
 	void reset();
 
+	// Returns true if the model contains an item referencing the given absolute path.
+	bool hasItemContainingPath(const QString &absPath) const;
+	
 	// Add methods
 	void addItem(Item *item);
 	void addDisk(Disk *disk);

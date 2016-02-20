@@ -10,6 +10,15 @@ Item::~Item()
 	qDeleteAll(paths);
 }
 
+bool Item::hasEntryContainingPath(const QString &absPath) const
+{
+	foreach (Item::ItemEntry *entry, paths)
+		if (entry->path.absoluteFilePath() == absPath)
+			return true;
+
+	return false;
+}
+
 void Item::addEntry(ItemEntry *entry)
 {
 	paths.push_back(entry);

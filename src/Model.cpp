@@ -22,6 +22,17 @@ void Model::reset()
 	emit onDiskChanged();
 }
 
+bool Model::hasItemContainingPath(const QString &absPath) const
+{
+	foreach (Item *item, items)
+	{
+		if (item->hasEntryContainingPath(absPath))
+			return true;
+	}
+
+	return false;
+}
+
 void Model::addItem(Item *item)
 {
 	QObject::connect(item, SIGNAL(onEntryChanged()), this, SIGNAL(onItemChanged()));

@@ -15,9 +15,9 @@ RCC_DIR = $$DESTDIR/.qrc
 UI_DIR = $$DESTDIR/.ui
 
 # Input
-HEADERS += src/MainWindow.h src/mulknap.h src/Model.h src/Item.h src/Disk.h src/ItemsModel.h src/FSUtils.h src/ItemDetailsModel.h
+HEADERS += src/MainWindow.h src/mulknap.h src/Model.h src/Item.h src/Disk.h src/ItemsModel.h src/FSUtils.h src/ItemDetailsModel.h src/FSTreeProxyFilter.h
 FORMS += forms/mainwindow.ui
-SOURCES += src/main.cpp src/MainWindow.cpp src/mulknap.c src/Model.cpp src/Item.cpp src/Disk.cpp src/ItemsModel.cpp src/ItemDetailsModel.cpp
+SOURCES += src/main.cpp src/MainWindow.cpp src/mulknap.c src/Model.cpp src/Item.cpp src/Disk.cpp src/ItemsModel.cpp src/ItemDetailsModel.cpp src/FSTreeProxyFilter.cpp
 RESOURCES += resources/application.qrc
 
 QT += widgets

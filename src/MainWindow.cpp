@@ -7,6 +7,7 @@
 #include "Model.h"
 #include "ItemsModel.h"
 #include "ItemDetailsModel.h"
+#include "FSTreeProxyFilter.h"
 #include "FSUtils.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -27,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui.tblItemDetails->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(onItemDetailsSelectionChanged()));
     QObject::connect(ui.actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     QObject::connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
-    QObject::connect(ui.editPath, SIGNAL(textChanged(const QString &)), this, SLOT(onRootPathChanged(const QString &)));
+    QObject::connect(ui.editPath, SIGNAL(textChanged(const QString &)), this, SLOT(onRootPathChanged()));
     ui.editPath->setText("/home/danilo/Desktop");
 
     showCentered();
@@ -48,7 +49,7 @@ void MainWindow::createModels()
     // File system
     model = new QFileSystemModel();
     model->setRootPath(QDir::currentPath());
-    ui.treeFileSystem->setModel(model);
+    // ui.treeFileSystem->setModel(model);
 
     // Items
     itemsModel = new ItemsModel(document);
@@ -57,6 +58,10 @@ void MainWindow::createModels()
     // Item details
     itemDetailsModel = new ItemDetailsModel(NULL);
     ui.tblItemDetails->setModel(itemDetailsModel);
+
+    fsProxyModel = new FSTreeProxyFilter(document);
+    fsProxyModel->setSourceModel(model);
+    ui.treeFileSystem->setModel(fsProxyModel);
 }
 
 void MainWindow::showCentered()
@@ -68,20 +73,17 @@ void MainWindow::showCentered()
                 );
 }
 
-void MainWindow::onRootPathChanged(const QString &value)
+void MainWindow::onRootPathChanged()
 {
-    QModelIndex pathIndex = model->index(value);
-
-    if (pathIndex.isValid())
-        ui.treeFileSystem->setRootIndex(pathIndex);
-    else
-        ui.treeFileSystem->setRootIndex(model->index(QDir::currentPath()));
+    const QString newPath = ui.editPath->text();
+    ui.treeFileSystem->setRootIndex(fsProxyModel->mapFromSource(model->setRootPath(newPath)));
 }
 
 void MainWindow::onTreeFSSelectionChanged()
 {
     const QModelIndexList indexes = ui.treeFileSystem->selectionModel()->selectedRows();
     ui.btnAddItem->setEnabled(!indexes.empty());
+    ui.btnAddItemSeparate->setEnabled(!indexes.empty());
 }
 
 void MainWindow::onItemsSelectionChanged()
@@ -105,24 +107,35 @@ void MainWindow::onItemDetailsSelectionChanged()
 void MainWindow::on_btnAddItem_clicked()
 {
     const QModelIndexList indexes = ui.treeFileSystem->selectionModel()->selectedRows();
+    QApplication::setOverrideCursor(Qt::WaitCursor);
 
     // Create the new item
     Item *item = new Item();
 
+    // Build the individual entries
+    foreach (QModelIndex index, indexes)
+        item->addEntry(entryFromIndex(index));
+
+    QApplication::restoreOverrideCursor();
+    addItem(item);
+}
+
+void MainWindow::on_btnAddItemSeparate_clicked()
+{
+    const QModelIndexList indexes = ui.treeFileSystem->selectionModel()->selectedRows();
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     // Build the individual entries
     foreach (QModelIndex index, indexes)
     {
-        Item::ItemEntry *entry = new Item::ItemEntry();
-        entry->path = model->fileInfo(index);
-        entry->size = FSUtils::computeSize(entry->path.absoluteFilePath());
+        // Create the new item
+        Item *item = new Item();
+        item->addEntry(entryFromIndex(index));
 
-        item->addEntry(entry);
+        addItem(item);
     }
 
     QApplication::restoreOverrideCursor();
-    addItem(item);
 }
 
 void MainWindow::on_btnRemoveItem_clicked()
@@ -156,6 +169,15 @@ void MainWindow::about()
             tr("The <b>DiskSpan</b> example demonstrates how to "
                "write modern GUI applications using Qt, with a menu bar, "
                "toolbars, and a status bar."));
+}
+
+Item::ItemEntry *MainWindow::entryFromIndex(const QModelIndex &index) const
+{
+    Item::ItemEntry *entry = new Item::ItemEntry();
+    entry->path = model->fileInfo(fsProxyModel->mapToSource(index));
+    entry->size = FSUtils::computeSize(entry->path.absoluteFilePath());
+
+    return entry;
 }
 
 void MainWindow::removeItems(const QList<Item *> &itemsToRemove)
