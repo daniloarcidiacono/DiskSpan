@@ -1,0 +1,3 @@
+TODO:
+	1) Capire perchè l'eseguibile ui_mainwindow.h ignora l'icona impostata da QtDesigner sull'azione actionQuit;
+	2) Migliorare struttura CMakeLists.txt

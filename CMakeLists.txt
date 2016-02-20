@@ -3,6 +3,7 @@ project(DiskSpan)
 
 # Tell CMake to run moc when necessary:
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
 
 # As moc files are generated in the binary dir, tell CMake
 # to always look for includes there:
@@ -22,15 +23,19 @@ add_definitions(${Qt5Widgets_DEFINITIONS})
 # without -fPIE. We add that here.
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
+# Ui forms
+QT5_WRAP_UI(UIS_HDRS ${CMAKE_SOURCE_DIR}/forms/mainwindow.ui)
+
 # Setup the Qt resources
-set(RESOURCE ${CMAKE_SOURCE_DIR}/application.qrc)
+set(RESOURCE ${CMAKE_SOURCE_DIR}/resources/application.qrc)
 qt5_add_resources(RESOURCE_ADDED ${RESOURCE})
 
 # Add the executables
-add_executable(DiskSpan main.cpp
-						MainWindow.cpp
-                   		mulknap.c 
-                   		${RESOURCE_ADDED})
+add_executable(DiskSpan ${CMAKE_SOURCE_DIR}/src/main.cpp
+						${CMAKE_SOURCE_DIR}/src/MainWindow.cpp
+                   		${CMAKE_SOURCE_DIR}/src/mulknap.c 
+                   		${RESOURCE_ADDED}
+                   		${UIS_HDRS})
 
 # The Qt5Widgets_LIBRARIES variable also includes QtGui and QtCore
 target_link_libraries(DiskSpan ${Qt5Widgets_LIBRARIES})
