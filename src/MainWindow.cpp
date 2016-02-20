@@ -8,15 +8,29 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui.setupUi(this);
 
+    model = new QFileSystemModel();
+    model->setRootPath(QDir::currentPath());
+    ui.treeFileSystem->setModel(model);
+
     // Signals
     QObject::connect(ui.actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     QObject::connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
-
+    QObject::connect(ui.editPath, SIGNAL(textChanged(const QString &)), this, SLOT(onRootPathChanged(const QString &)));
     showCentered();
 }
 
 MainWindow::~MainWindow()
 {
+}
+
+void MainWindow::onRootPathChanged(const QString &value)
+{
+    QModelIndex pathIndex = model->index(value);
+
+    if (pathIndex.isValid())
+        ui.treeFileSystem->setRootIndex(pathIndex);
+    else
+        ui.treeFileSystem->setRootIndex(model->index(QDir::currentPath()));
 }
 
 void MainWindow::showCentered()

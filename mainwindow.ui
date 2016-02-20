@@ -47,7 +47,7 @@
           </layout>
          </item>
          <item>
-          <widget class="QTreeView" name="treeView"/>
+          <widget class="QTreeView" name="treeFileSystem"/>
          </item>
         </layout>
        </item>
@@ -117,7 +117,7 @@
  </widget>
  <tabstops>
   <tabstop>editPath</tabstop>
-  <tabstop>treeView</tabstop>
+  <tabstop>treeFileSystem</tabstop>
  </tabstops>
  <resources>
   <include location="resources/application.qrc"/>
