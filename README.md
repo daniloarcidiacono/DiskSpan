@@ -2,8 +2,17 @@
 Qt >= 5.5
 
 # How to build
+## Unix (g++)
 qmake
+
 make
+
+## Windows (msvc)
+Open VS command prompt.
+
+qmake
+
+nmake -f Makefile
 
 # Troubleshooting
 ## Windows

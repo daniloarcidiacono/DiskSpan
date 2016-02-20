@@ -1,6 +1,6 @@
 
 /* ======================================================================
-	     mulknap.c,  David Pisinger                     feb 1998 
+       mulknap.c,  David Pisinger                     feb 1998 
    ====================================================================== */
 
 /* This is the MULKNAP algorithm for solving the multiple knapsack 
@@ -48,14 +48,14 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdarg.h>
-#include <values.h>
+// #include <values.h>
 #include <string.h>
 #include <math.h>
 #include <signal.h>
 
 
 /* ======================================================================
-				   macros
+           macros
    ====================================================================== */
 
 #define SYNC            5      /* when to switch to linear scan in bins */
@@ -90,7 +90,7 @@
 
 
 /* ======================================================================
-				 type declarations
+         type declarations
    ====================================================================== */
 
 typedef int           boolean; /* logical variable         */
@@ -244,7 +244,7 @@ typedef struct {
 
 
 /* ======================================================================
-				 debug variables
+         debug variables
    ====================================================================== */
 
 long iterates;          /* iterations in branch-and-bound */
@@ -263,7 +263,7 @@ long coresize;          /* max number of variables considered in b&b */
 
 
 /* ======================================================================
-			    forward declarations
+          forward declarations
    ====================================================================== */
 
 
@@ -271,7 +271,7 @@ static void minknap(allinfo *a, item *fitem, stype c, stype z);
 
 
 /* ======================================================================
-			          debug routines
+                debug routines
    ====================================================================== */
 
 static void error(char *str, ...)
@@ -301,21 +301,22 @@ static void error(char *str, ...)
 
 #define _POSIX_SOURCE         /* to read <unistd.h> on digital UNIX */
 #define _INCLUDE_POSIX_SOURCE /* to read <unistd.h> on HP-UX */
-#include <unistd.h>           /* define the constant _SC_CLK_TCK */
-#include <sys/times.h>        /* timing routines */
+//#include <unistd.h>           /* define the constant _SC_CLK_TCK */
+//#include <sys/times.h>        /* timing routines */
 
 static void give_time(long *time)
 { /* return the number of milliseconds used */
-  struct tms timeend;
+  /*struct tms timeend;
   double t1;
   times(&timeend);
   t1 = (double) (timeend.tms_utime) / sysconf(_SC_CLK_TCK);
-  *time = t1 * 1000;
+  *time = t1 * 1000;*/
+  *time = 0;
 }
 
 
 /* ======================================================================
-				  palloc
+          palloc
    ====================================================================== */
 
 static void pfree(void *p)
@@ -338,7 +339,7 @@ static void *palloc(long size, long no)
 
 
 /* ======================================================================
-				  findvect
+          findvect
    ====================================================================== */
 
 static state *findvect(stype ws1, state *f1, state *l1)
@@ -362,7 +363,7 @@ static state *findvect(stype ws1, state *f1, state *l1)
 
 
 /* ======================================================================
-				push/pop
+        push/pop
    ====================================================================== */
 
 static void push(allinfo *a, int side, item *f, item *l)
@@ -382,9 +383,9 @@ static void pop(allinfo *a, int side, item **f, item **l)
   interval *pos;
   switch (side) {
     case LEFT : if (a->intv1 == a->intv1b) error("pop left");
-		(a->intv1)--; pos = a->intv1; break;
+    (a->intv1)--; pos = a->intv1; break;
     case RIGHT: if (a->intv2 == a->intv2b) error("pop right");
-		(a->intv2)++; pos = a->intv2; break;
+    (a->intv2)++; pos = a->intv2; break;
   }
   *f = pos->f; *l = pos->l;
 }
@@ -398,7 +399,7 @@ static void pop(allinfo *a, int side, item **f, item **l)
 
 
 /* ======================================================================
-				weightsort
+        weightsort
    ====================================================================== */
 
 static void weightsort(allinfo *a, item *f, item *l)
@@ -430,7 +431,7 @@ static void weightsort(allinfo *a, item *f, item *l)
 
 
 /* ======================================================================
-			     compress
+           compress
    ====================================================================== */
 
 static item *compress(item *f, item *l, mtype y)
@@ -451,7 +452,7 @@ static item *compress(item *f, item *l, mtype y)
 
 
 /* ======================================================================
-			           freeitems
+                 freeitems
    ====================================================================== */
 
 static item *freeitems(allinfo *a, stype *psumfree, item *f, item *l, mtype y)
@@ -582,7 +583,7 @@ static void wsub(allinfo *a, item *s)
 
 
 /* ======================================================================
-			      definesolution2
+            definesolution2
    ====================================================================== */
 
 static void definesolution2(allinfo *a, wstate *i1, wstate *j1)
@@ -623,7 +624,7 @@ static void definesolution2(allinfo *a, wstate *i1, wstate *j1)
 
 
 /* ======================================================================
-				  reducewgtset
+          reducewgtset
    ====================================================================== */
 
 static void reducewgtset(allinfo *a, boolean update)
@@ -661,7 +662,7 @@ static void reducewgtset(allinfo *a, boolean update)
 
 
 /* ======================================================================
-				 findwbreak
+         findwbreak
    ====================================================================== */
 
 static void findwbreak(allinfo *a, mtype m, boolean update)
@@ -700,7 +701,7 @@ static void findwbreak(allinfo *a, mtype m, boolean update)
 
 
 /* ======================================================================
-				  partition
+          partition
    ====================================================================== */
 
 static void partition(allinfo *a, boolean update)
@@ -802,7 +803,7 @@ static void satisfy(allinfo *a, boolean update, stype *c)
 
 
 /* ======================================================================
-				improvesolution
+        improvesolution
    ====================================================================== */
 
 static void improvesolution(allinfo *a, state *v)
@@ -818,7 +819,7 @@ static void improvesolution(allinfo *a, state *v)
 
 
 /* ======================================================================
-				definesolution
+        definesolution
    ====================================================================== */
 
 static void definesolution(allinfo *a)
@@ -870,7 +871,7 @@ static void definesolution(allinfo *a)
 
 
 /* ======================================================================
-				partsort
+        partsort
    ====================================================================== */
 
 static void partsort(allinfo *a, item *f, item *l, stype ws, int what)
@@ -954,7 +955,7 @@ static boolean haschance(allinfo *a, item *i, int side)
 
 
 /* ======================================================================
-				  multiply
+          multiply
    ====================================================================== */
 
 static void multiply(allinfo *a, item *h, int side)
@@ -1134,7 +1135,7 @@ static void reduceset(allinfo *a)
 
 
 /* ======================================================================
-				  initfirst
+          initfirst
    ====================================================================== */
 
 static void initfirst(allinfo *a, stype ps, stype ws)
@@ -1155,7 +1156,7 @@ static void initfirst(allinfo *a, stype ps, stype ws)
 
 
 /* ======================================================================
-				  initvect
+          initvect
    ====================================================================== */
 
 static void initvect(allinfo *a)
@@ -1168,7 +1169,7 @@ static void initvect(allinfo *a)
 
 
 /* ======================================================================
-				findbreak
+        findbreak
    ====================================================================== */
 
 static int findbreak(allinfo *a)
@@ -1217,7 +1218,7 @@ static int findbreak(allinfo *a)
 
 
 /* ======================================================================
-				minknap
+        minknap
    ====================================================================== */
 
 static void minknap(allinfo *a, item *fitem, stype c, stype lb)
@@ -1248,14 +1249,14 @@ static void minknap(allinfo *a, item *fitem, stype c, stype lb)
 
     while ((a->d.size > 0) && (a->z != a->ub)) {
       if (a->t <= a->lsort) {
-	if (haschance(a, a->t, RIGHT)) multiply(a, a->t, RIGHT);
-	(a->t)++;
+  if (haschance(a, a->t, RIGHT)) multiply(a, a->t, RIGHT);
+  (a->t)++;
       }
       reduceset(a);
 
       if (a->s >= a->fsort) {
-	if (haschance(a, a->s, LEFT)) multiply(a, a->s, LEFT);
-	(a->s)--;
+  if (haschance(a, a->s, LEFT)) multiply(a, a->s, LEFT);
+  (a->s)--;
       }
       reduceset(a);
     }
@@ -1275,7 +1276,7 @@ static void minknap(allinfo *a, item *fitem, stype c, stype lb)
 
 
 /* ======================================================================
-			         findbest
+               findbest
    ====================================================================== */
 
 static void findbest(allinfo *a, stype *c, item **k1, mtype *i1)
@@ -1314,7 +1315,7 @@ static void findbest(allinfo *a, stype *c, item **k1, mtype *i1)
 
 
 /* ======================================================================
-			       copysolution
+             copysolution
    ====================================================================== */
 
 static void copysolution(allinfo *a)
@@ -1329,7 +1330,7 @@ static void copysolution(allinfo *a)
 
 
 /* ======================================================================
-			       reduceitems
+             reduceitems
    ====================================================================== */
 
 static void reduceitems(allinfo *a, stype z, stype c)
@@ -1355,7 +1356,7 @@ static void reduceitems(allinfo *a, stype z, stype c)
 
 
 /* ======================================================================
-				alloctables
+        alloctables
    ====================================================================== */
 
 static void alloctables(allinfo *a)
@@ -1381,7 +1382,7 @@ static void freetables(allinfo *a)
 
 
 /* ======================================================================
-				mulbranch
+        mulbranch
    ====================================================================== */
 
 static void mulbranch(allinfo *a, stype *c1)
@@ -1507,5 +1508,4 @@ extern int mulknap(int n, int m, int *p, int *w, int *x, int *c)
   give_time(&t2); tottime = t2 - t1;
   return a.z1;
 }
-
 
