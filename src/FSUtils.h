@@ -34,8 +34,8 @@ public:
 	static QString formatSize(const quint64 sizeInBytes)
 	{
 		const quint64 KB = 1024;
-		const quint64 MB = KB * KB;
-		const quint64 GB = MB * MB;
+		const quint64 MB = 1024 * KB;
+		const quint64 GB = 1024 * MB;
 
 		if (sizeInBytes < KB)
 			return QString("%1 bytes").arg(sizeInBytes);
