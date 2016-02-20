@@ -42,6 +42,7 @@ void Model::addItem(Item *item)
 
 void Model::addDisk(Disk *disk)
 {
+	QObject::connect(disk, SIGNAL(onItemChanged()), this, SIGNAL(onDiskChanged()));
 	disks.push_back(disk);
 	emit onDiskChanged();
 }
@@ -68,6 +69,7 @@ void Model::removeItems(const QList<Item *> itemsToRemove)
 
 void Model::removeDisk(Disk *disk)
 {
+	QObject::disconnect(disk, SIGNAL(onItemChanged()), this, SIGNAL(onDiskChanged()));
 	disks.removeAll(disk);
 	delete disk;
 	emit onDiskChanged();

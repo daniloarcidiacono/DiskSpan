@@ -1,22 +1,30 @@
 #include "Disk.h"
 #include "Item.h"
 
-Disk::Disk()
+Disk::Disk(const quint64 capacity)
+	: QObject()
 {
-	capacity = 0;
+	this->capacity = capacity;
 }
 
 Disk::~Disk()
 {
-	items.clear();
 }
 
 void Disk::addItem(Item *item)
 {
 	items.push_back(item);
+	emit onItemChanged();
 }
 
 void Disk::removeItem(Item *item)
 {
 	items.removeAll(item);
+	emit onItemChanged();
+}
+
+void Disk::clear()
+{
+	items.clear();
+	emit onItemChanged();
 }

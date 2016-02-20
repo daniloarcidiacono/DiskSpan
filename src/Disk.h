@@ -1,19 +1,25 @@
 #ifndef DISK_H
 #define DISK_H
 #include <QList>
+#include <QObject>
 
 // Forward declarations
 class Item;
 
-class Disk
+class Disk : public QObject
 {
+	Q_OBJECT
+
 private:
 	// Items (NOT owned by this class)
 	QList<Item *> items;
 	quint64 capacity;
 
+signals:
+	void onItemChanged();
+
 public:
-	Disk();
+	Disk(const quint64 capacity = 0);
 	virtual ~Disk();
 
 	// Add methods
@@ -21,6 +27,9 @@ public:
 
 	// Remove methods
 	void removeItem(Item *item);
+
+	// Removes all the items
+	void clear();
 
 	// Gets an item
 	Item *getItem(const int index) const { return items.at(index); }

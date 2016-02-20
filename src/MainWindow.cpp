@@ -3,12 +3,22 @@
 #include <QDesktopWidget>
 #include <QTextStream>
 #include <QDebug>
+#include <QtAlgorithms>
 #include "MainWindow.h"
 #include "Model.h"
 #include "ItemsModel.h"
 #include "ItemDetailsModel.h"
 #include "FSTreeProxyFilter.h"
+#include "AddDiskDialog.h"
 #include "FSUtils.h"
+#include "Disk.h"
+#include "DiskModel.h"
+#include "DiskDetailsModel.h"
+
+extern "C"
+{
+    #include "mulknap.h"
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -29,6 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui.actionQuit, SIGNAL(triggered()), this, SLOT(close()));
     QObject::connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
     QObject::connect(ui.editPath, SIGNAL(textChanged(const QString &)), this, SLOT(onRootPathChanged()));
+    QObject::connect(ui.cboDisks, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentDiskChanged()));
+
     ui.editPath->setText("/home/danilo/Desktop");
 
     showCentered();
@@ -59,6 +71,15 @@ void MainWindow::createModels()
     itemDetailsModel = new ItemDetailsModel(NULL);
     ui.tblItemDetails->setModel(itemDetailsModel);
 
+    // Disks
+    diskModel = new DiskModel(document);
+    ui.cboDisks->setModel(diskModel);
+
+    // Disk details
+    diskDetailsModel = new DiskDetailsModel(NULL);
+    ui.tblDisk->setModel(diskDetailsModel);
+
+    // Proxy
     fsProxyModel = new FSTreeProxyFilter(document);
     fsProxyModel->setSourceModel(model);
     ui.treeFileSystem->setModel(fsProxyModel);
@@ -102,6 +123,14 @@ void MainWindow::onItemDetailsSelectionChanged()
 {
     const QModelIndexList indexes = ui.tblItemDetails->selectionModel()->selectedRows();
     ui.btnRemoveFromItem->setEnabled(!indexes.empty());
+}
+
+void MainWindow::onCurrentDiskChanged()
+{    
+    const int index = ui.cboDisks->currentIndex();    
+    ui.btnRemoveDisk->setEnabled(index != -1);
+    if (index != -1)
+        diskDetailsModel->setDisk(document->getDisk(index));
 }
 
 void MainWindow::on_btnAddItem_clicked()
@@ -161,6 +190,109 @@ void MainWindow::on_btnRemoveFromItem_clicked()
 
     // Remove the entries
     removeEntriesFromCurrentItem(itemsToRemove);
+}
+
+void MainWindow::on_btnAddDisk_clicked()
+{
+    AddDiskDialog *dlg = new AddDiskDialog(this);
+
+    switch (dlg->exec())
+    {
+        case QDialog::Accepted:
+        {
+            Disk *disk = new Disk(dlg->getCapacity());
+            addDisk(disk);
+            break;
+        }
+    }
+}
+
+void MainWindow::on_btnRemoveDisk_clicked()
+{
+}
+
+/*
+template<typename T> class CompareIndicesByAnotherVectorValues
+{ 
+    T *values;
+
+public: 
+    CompareIndicesByAnotherVectorValues(T *_values)
+        : values(_values)
+    {
+    } 
+
+    bool operator()(const int &a, const int &b) const
+    { 
+        return (values)[a] > (values)[b]; 
+    } 
+}; 
+
+template <typename T> int *sort_indexes(T *v, const int vSize)
+{
+    // initialize original index locations
+    int *idx = new int[vSize];
+
+    for (int i = 0; i != vSize; i++)
+        idx[i] = i;
+
+    // sort indexes based on comparing values in v
+    sort(idx.begin(), idx.end(), CompareIndicesByAnotherVectorValues<int>(v));
+
+    return idx;
+}*/
+
+void MainWindow::on_actionComputeDisks_triggered()
+{
+    /*
+    n: numero di oggetti
+    m: numero di zaini
+    p: profitto per oggetto (interi positivi)
+    w: peso per oggetto (interi positivi)
+    c: capacità per zaino (interi positivi)
+    x: risultati*/
+
+    const int n = document->getItemCount();
+    const int m = document->getDiskCount();
+    int *p = new int[n];
+    int *w = p;
+    int *c = new int[m];
+    int *x = new int[n];
+    
+    for (int i = 0; i < n; i++)
+        p[i] = document->getItem(i)->getTotalSize();
+
+    for (int i = 0; i < m; i++)
+        c[i] = document->getDisk(i)->getCapacity();
+
+    const int *cIndexes = sort_indexes(c, m);
+
+    qDebug() << "Before invoking mulknap..." << endl;
+    
+    //qSort(list.begin(), list.end(), CompareIndicesByAnotherVectorValues<int>(c));
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);   
+    mulknap(n, m, p, w, x, c);
+    QApplication::restoreOverrideCursor();
+
+    for (int i = 0; i < m; i++)
+        document->getDisk(i)->clear();
+
+    for (int i = 0; i < n; i++)
+    {
+        qDebug() << QString("x[%1] = %2").arg(i).arg(x[i]) << endl;
+
+        // i: indice item
+        // x[i]: indice disco
+        Item *item = document->getItem(i);
+        Disk *disk = document->getDisk(x[i]);
+        disk->addItem(item);
+    }
+
+    delete []p;
+    delete []c;
+    delete []x;
+    //delete []cIndexes;
 }
 
 void MainWindow::about()
@@ -225,4 +357,9 @@ void MainWindow::removeEntriesFromCurrentItem(const QList<Item::ItemEntry *> &it
 
     // Reset the selection
     ui.tblItemDetails->selectionModel()->clearSelection();
+}
+
+void MainWindow::addDisk(Disk *disk)
+{
+    document->addDisk(disk);
 }

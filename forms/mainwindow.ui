@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1265</width>
+    <width>1282</width>
     <height>816</height>
    </rect>
   </property>
@@ -217,6 +217,12 @@
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
            <widget class="QLabel" name="label">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
              <string>Disk:</string>
             </property>
@@ -227,19 +233,6 @@
           </item>
           <item>
            <widget class="QComboBox" name="cboDisks"/>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer_5">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </item>
@@ -277,6 +270,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="btnRemoveDisk">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>Remove</string>
             </property>
@@ -308,7 +304,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1265</width>
+     <width>1282</width>
      <height>25</height>
     </rect>
    </property>
@@ -328,7 +324,7 @@
     <property name="title">
      <string>&amp;Disks</string>
     </property>
-    <addaction name="actionCompute_disks"/>
+    <addaction name="actionComputeDisks"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Disks"/>
@@ -356,7 +352,7 @@
     <string>Add disk...</string>
    </property>
   </action>
-  <action name="actionCompute_disks">
+  <action name="actionComputeDisks">
    <property name="text">
     <string>Compute disks</string>
    </property>

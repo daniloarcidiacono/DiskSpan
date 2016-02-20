@@ -11,6 +11,9 @@ class ItemsModel;
 class ItemDetailsModel;
 class FSTreeProxyFilter;
 class Model;
+class Disk;
+class DiskModel;
+class DiskDetailsModel;
 
 class MainWindow : public QMainWindow
 {
@@ -26,6 +29,8 @@ private:
 	QFileSystemModel *model;
 	ItemsModel *itemsModel;
 	ItemDetailsModel *itemDetailsModel;
+	DiskModel *diskModel;
+	DiskDetailsModel *diskDetailsModel;
 
 	// Proxy models
 	FSTreeProxyFilter *fsProxyModel;
@@ -41,16 +46,21 @@ protected:
 	void removeCurrentItem();
 	void addItem(Item *item);
 	void removeEntriesFromCurrentItem(const QList<Item::ItemEntry *> &itemsToRemove);
+	void addDisk(Disk *disk);
 
 protected slots:
 	void onRootPathChanged();
 	void onTreeFSSelectionChanged();
 	void onItemsSelectionChanged();
 	void onItemDetailsSelectionChanged();
+	void onCurrentDiskChanged();
 	void on_btnAddItem_clicked();
 	void on_btnAddItemSeparate_clicked();
 	void on_btnRemoveItem_clicked();
 	void on_btnRemoveFromItem_clicked();
+	void on_btnAddDisk_clicked();
+	void on_btnRemoveDisk_clicked();
+	void on_actionComputeDisks_triggered();
     void about();
 
 public:
