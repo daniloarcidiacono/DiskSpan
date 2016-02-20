@@ -109,6 +109,8 @@ void MainWindow::on_btnAddItem_clicked()
     // Create the new item
     Item *item = new Item();
 
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
     // Build the individual entries
     foreach (QModelIndex index, indexes)
     {
@@ -119,6 +121,7 @@ void MainWindow::on_btnAddItem_clicked()
         item->addEntry(entry);
     }
 
+    QApplication::restoreOverrideCursor();
     addItem(item);
 }
 
