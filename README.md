@@ -29,4 +29,4 @@ sudo apt-get install libglu1-mesa-dev
 
 ## License
 
-[GNU LGPL license](https://www.openclinica.com/gnu-lgpl-open-source-license)
+[GNU LGPL license](http://www.gnu.org/licenses/lgpl-3.0.html)

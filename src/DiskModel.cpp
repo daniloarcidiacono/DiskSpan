@@ -15,9 +15,9 @@
  *  along with DiskSpan.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "DiskModel.h"
-#include "Disk.h"
+#include "model/Disk.h"
+#include "model/Model.h"
 #include "FSUtils.h"
-#include "Model.h"
 
 DiskModel::DiskModel(Model *model, QObject *parent)
 	: QAbstractListModel(parent)

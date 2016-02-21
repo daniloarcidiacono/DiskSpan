@@ -1,5 +1,8 @@
 <RCC>
   <qresource>
     <file>quit.png</file>
+    <file>new.png</file>
+    <file>open.png</file>
+    <file>save.png</file>
   </qresource>
 </RCC>

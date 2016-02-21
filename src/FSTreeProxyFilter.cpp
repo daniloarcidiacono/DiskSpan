@@ -15,7 +15,7 @@
  *  along with DiskSpan.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "FSTreeProxyFilter.h"
-#include "Model.h"
+#include "model/Model.h"
 #include <QFileSystemModel>
 #include <QtDebug>
  

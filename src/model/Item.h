@@ -18,10 +18,14 @@
 #define ITEM_H
 #include <QList>
 #include <QFileInfo>
+#include <QDataStream>
 
 class Item : public QObject
 {
 	Q_OBJECT
+
+friend QDataStream &operator <<(QDataStream &out, const Item &foo);
+friend QDataStream &operator >>(QDataStream &in, Item &foo);
 
 public:
 	class ItemEntry
@@ -49,11 +53,15 @@ public:
 	Item(QObject *parent = 0);
 	virtual ~Item();
 
+	// Resets the entry
+	void reset();
+
 	// Returns true if the item contains an entry referring to the given absolute path.
 	bool hasEntryContainingPath(const QString &absPath) const;
 
 	// Add methods
 	void addEntry(ItemEntry *entry);
+	void addEntries(const QList<ItemEntry *> &newEntries);
 
 	// Remove methods
 	void removeEntry(ItemEntry *entry);
@@ -69,5 +77,8 @@ public:
 	ItemEntry *getEntry(const int index) const { return paths.at(index); }
 	int getEntryCount() const { return paths.size(); }
 };
+
+QDataStream &operator <<(QDataStream &out, const Item &foo);
+QDataStream &operator >>(QDataStream &in, Item &foo);
 
 #endif

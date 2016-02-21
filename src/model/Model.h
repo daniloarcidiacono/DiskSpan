@@ -18,6 +18,7 @@
 #define MODEL_H
 #include <QObject>
 #include <QList>
+#include <QDataStream>
 
 // Forward declaration
 class Item;
@@ -26,6 +27,9 @@ class Disk;
 class Model : public QObject
 {
 	Q_OBJECT
+
+friend QDataStream &operator <<(QDataStream &out, const Model &foo);
+friend QDataStream &operator >>(QDataStream &in, Model &foo);
 
 private:
 	// Items (owned by this class)
@@ -39,7 +43,7 @@ signals:
 	void onDiskChanged();
 
 public:
-	Model();
+	Model(QObject *parent = 0);
 	virtual ~Model();
 
 	// Resets the model
@@ -50,7 +54,9 @@ public:
 	
 	// Add methods
 	void addItem(Item *item);
+	void addItems(const QList<Item *> &newItems);
 	void addDisk(Disk *disk);
+	void addDisks(const QList<Disk *> &newItems);
 
 	// Remove methods
 	void removeItem(Item *item);
@@ -71,5 +77,8 @@ public:
 	int getItemCount() const { return items.size(); }
 	int getDiskCount() const { return disks.size(); }
 };
+
+QDataStream &operator <<(QDataStream &out, const Model &foo);
+QDataStream &operator >>(QDataStream &in, Model &foo);
 
 #endif

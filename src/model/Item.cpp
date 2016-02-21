@@ -26,6 +26,12 @@ Item::~Item()
 	qDeleteAll(paths);
 }
 
+void Item::reset()
+{
+	qDeleteAll(paths);
+	emit onEntryChanged();
+}
+
 bool Item::hasEntryContainingPath(const QString &absPath) const
 {
 	foreach (Item::ItemEntry *entry, paths)
@@ -38,6 +44,14 @@ bool Item::hasEntryContainingPath(const QString &absPath) const
 void Item::addEntry(ItemEntry *entry)
 {
 	paths.push_back(entry);
+	emit onEntryChanged();
+}
+
+void Item::addEntries(const QList<ItemEntry *> &newEntries)
+{
+	foreach (ItemEntry *entry, newEntries)
+		paths.push_back(entry);
+
 	emit onEntryChanged();
 }
 
@@ -77,4 +91,46 @@ quint64 Item::getTotalSize() const
 		ret += entry->size;
 
 	return ret;
+}
+
+QDataStream &operator <<(QDataStream &out, const Item &foo)
+{
+	out << foo.paths.size();
+	foreach (Item::ItemEntry *entry, foo.paths)
+	{
+		out << entry->path.absoluteFilePath();
+		out << entry->size;
+	}
+
+	return out;
+}
+
+QDataStream &operator >>(QDataStream &in, Item &foo)
+{
+	foo.reset();
+
+	// Read the entries
+	int nPaths;
+	in >> nPaths;
+	QList<Item::ItemEntry *> entries;
+	for (int i = 0; i < nPaths; i++)
+	{		
+		// Read the raw dat
+		QString absPath;
+		quint64 size;
+		in >> absPath;
+		in >> size;
+
+		// Create the entry
+		Item::ItemEntry *entry = new Item::ItemEntry();
+		entry->path = QFileInfo(absPath);
+		entry->size = size;
+
+		// Add it
+		entries.push_back(entry);
+	}
+
+	// Add them to the item
+	foo.addEntries(entries);
+	return in;
 }

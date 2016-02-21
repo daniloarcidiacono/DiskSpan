@@ -17,9 +17,10 @@
 #include "Model.h"
 #include "Item.h"
 #include "Disk.h"
+#include <QDebug>
 
-Model::Model()
-	: QObject()
+Model::Model(QObject *parent)
+	: QObject(parent)
 {
 	reset();
 }
@@ -56,10 +57,32 @@ void Model::addItem(Item *item)
 	emit onItemChanged();
 }
 
+void Model::addItems(const QList<Item *> &newItems)
+{
+	foreach (Item *item, newItems)
+	{
+		QObject::connect(item, SIGNAL(onEntryChanged()), this, SIGNAL(onItemChanged()));
+		items.push_back(item);
+	}
+
+	emit onItemChanged();	
+}
+
 void Model::addDisk(Disk *disk)
 {
 	QObject::connect(disk, SIGNAL(onItemChanged()), this, SIGNAL(onDiskChanged()));
 	disks.push_back(disk);
+	emit onDiskChanged();
+}
+
+void Model::addDisks(const QList<Disk *> &newItems)
+{	
+	foreach (Disk *disk, newItems)
+	{
+		QObject::connect(disk, SIGNAL(onItemChanged()), this, SIGNAL(onDiskChanged()));
+		disks.push_back(disk);
+	}
+	
 	emit onDiskChanged();
 }
 
@@ -108,4 +131,79 @@ quint64 Model::getTotalItemSize() const
         totalSize += item->getTotalSize();
 
     return totalSize;
+}
+
+QDataStream &operator <<(QDataStream &out, const Model &foo)
+{
+	// Write a header with a "magic number" and a version
+	out << (quint32)0xA0B0C0D0;
+	out << (qint32)020;
+	out.setVersion(QDataStream::Qt_5_5);
+
+	// Write the data
+	out << foo.items.size();
+	foreach (Item *item, foo.items)
+		out << *item;
+
+	out << foo.disks.size();
+	foreach (Disk *disk, foo.disks)
+		out << *disk;
+
+	return out;
+}
+
+QDataStream &operator >>(QDataStream &in, Model &foo)
+{
+	// Read and check the header
+	quint32 magic;
+	in >> magic;
+	//if (magic != 0xA0B0C0D0)
+	//    return XXX_BAD_FILE_FORMAT;
+
+	// Read the version
+	qint32 version;
+	in >> version;
+	/*if (version < 100)
+	    return XXX_BAD_FILE_TOO_OLD;
+	if (version > 123)
+	    return XXX_BAD_FILE_TOO_NEW;*/
+
+	/*if (version <= 110)
+	    in.setVersion(QDataStream::Qt_3_2);
+	else
+	    in.setVersion(QDataStream::Qt_4_0);*/
+
+	in.setVersion(QDataStream::Qt_5_5);
+	
+	foo.reset();
+	
+	// Read the items
+	int nItems;
+	in >> nItems;
+	qDebug() << "modelread: nItems = " << nItems;
+	QList<Item *> items;
+	for (int i = 0; i < nItems; i++)
+	{
+		Item *item = new Item();
+		in >> *item;
+		items.push_back(item);
+	}
+
+	// Read the disks
+	int nDisks;
+	in >> nDisks;
+	qDebug() << "modelread: nDisks = " << nDisks;
+	QList<Disk *> disks;
+	for (int i = 0; i < nDisks; i++)
+	{
+		Disk *disk = new Disk();
+		in >> *disk;
+		disks.push_back(disk);
+	}
+
+	// Setup the document
+	foo.addItems(items);
+	foo.addDisks(disks);
+
+	return in;
 }

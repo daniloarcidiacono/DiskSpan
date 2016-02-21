@@ -17,7 +17,7 @@
 #ifndef ITEMDETAILSMODEL_H
 #define ITEMDETAILSMODEL_H
 #include <QAbstractTableModel>
-#include "Item.h"
+#include "model/Item.h"
 
 class ItemDetailsModel : public QAbstractTableModel
 {

@@ -33,6 +33,14 @@ void Disk::addItem(Item *item)
 	emit onItemChanged();
 }
 
+void Disk::addItems(const QList<Item *> &newItems)
+{
+	foreach (Item *item, newItems)
+		items.push_back(item);
+
+	emit onItemChanged();
+}
+
 void Disk::removeItem(Item *item)
 {
 	items.removeAll(item);
@@ -52,4 +60,41 @@ quint64 Disk::getUsedCapacity() const
 		ret += item->getTotalSize();
 
 	return ret;
+}
+
+QDataStream &operator <<(QDataStream &out, const Disk &foo)
+{
+	out << foo.capacity;
+	out << foo.items.size();
+	foreach (Item *item, foo.items)
+		out << *item;
+
+	return out;
+}
+
+QDataStream &operator >>(QDataStream &in, Disk &foo)
+{
+	// Reset
+	foo.clear();
+	
+	// Read the capacity
+	quint64 capacity;
+	in >> capacity;
+	foo.setCapacity(capacity);
+
+	// Read the items
+	int nItems;
+	in >> nItems;
+	QList<Item *> items;
+	for (int i = 0; i < nItems; i++)
+	{
+		Item *item = new Item();
+		in >> *item;
+		items.push_back(item);
+	}
+
+	// Add them to the disk
+	foo.addItems(items);
+
+	return in;
 }

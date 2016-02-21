@@ -15,9 +15,9 @@ RCC_DIR = $$DESTDIR/.qrc
 UI_DIR = $$DESTDIR/.ui
 
 # Input
-HEADERS += src/MainWindow.h src/Model.h src/Item.h src/Disk.h src/ItemsModel.h src/FSUtils.h src/ItemDetailsModel.h src/FSTreeProxyFilter.h src/DiskModel.h src/DiskDetailsModel.h src/BinSolver.h src/BFDSolver.h src/SortUtils.h
-FORMS += forms/mainwindow.ui
-SOURCES += src/main.cpp src/MainWindow.cpp src/Model.cpp src/Item.cpp src/Disk.cpp src/ItemsModel.cpp src/ItemDetailsModel.cpp src/FSTreeProxyFilter.cpp src/DiskModel.cpp src/DiskDetailsModel.cpp src/BFDSolver.cpp
+HEADERS += src/MainWindow.h src/model/Model.h src/model/Item.h src/model/Disk.h src/ItemsModel.h src/FSUtils.h src/ItemDetailsModel.h src/FSTreeProxyFilter.h src/DiskModel.h src/DiskDetailsModel.h src/solver/BinSolver.h src/solver/BFDSolver.h src/solver/SortUtils.h src/components/DocumentComponent.h src/components/FileSystemComponent.h src/components/TransferComponent.h src/components/ItemsComponent.h src/components/DisksComponent.h
+FORMS += forms/mainwindow.ui forms/filesystemwidget.ui forms/transferwidget.ui forms/itemswidget.ui forms/diskswidget.ui
+SOURCES += src/main.cpp src/MainWindow.cpp src/model/Model.cpp src/model/Item.cpp src/model/Disk.cpp src/ItemsModel.cpp src/ItemDetailsModel.cpp src/FSTreeProxyFilter.cpp src/DiskModel.cpp src/DiskDetailsModel.cpp src/solver/BFDSolver.cpp src/components/DocumentComponent.cpp src/components/FileSystemComponent.cpp src/components/TransferComponent.cpp src/components/ItemsComponent.cpp src/components/DisksComponent.cpp
 RESOURCES += resources/application.qrc
 
 QT += widgets

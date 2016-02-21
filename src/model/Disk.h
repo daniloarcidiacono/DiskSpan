@@ -18,6 +18,7 @@
 #define DISK_H
 #include <QList>
 #include <QObject>
+#include <QDataStream>
 
 // Forward declarations
 class Item;
@@ -25,6 +26,9 @@ class Item;
 class Disk : public QObject
 {
 	Q_OBJECT
+
+friend QDataStream &operator <<(QDataStream &out, const Disk &foo);
+friend QDataStream &operator >>(QDataStream &in, Disk &foo);
 
 private:
 	// Items (NOT owned by this class)
@@ -38,14 +42,15 @@ public:
 	Disk(const quint64 capacity = 0);
 	virtual ~Disk();
 
-	// Add methods
-	void addItem(Item *item);
-
-	// Remove methods
-	void removeItem(Item *item);
-
 	// Removes all the items
 	void clear();
+
+	// Add methods
+	void addItem(Item *item);
+	void addItems(const QList<Item *> &newItems);
+	
+	// Remove methods
+	void removeItem(Item *item);
 
 	// Returns the used capacity of the disk
 	quint64 getUsedCapacity() const;
@@ -60,5 +65,8 @@ public:
 	// Set methods
 	void setCapacity(const quint64 value) { capacity = value; }
 };
+
+QDataStream &operator <<(QDataStream &out, const Disk &foo);
+QDataStream &operator >>(QDataStream &in, Disk &foo);
 
 #endif
