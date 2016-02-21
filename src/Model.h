@@ -41,13 +41,16 @@ public:
 	void removeItems(const QList<Item *> itemsToRemove);
 	void removeDisk(Disk *disk);
 	void removeDisks();
-	
+
 	// Gets an item
 	Item *getItem(const int index) const { return items.at(index); }
 
 	// Gets a disk
 	Disk *getDisk(const int index) const { return disks.at(index); }
 
+	// Returns the sum of the sizes of every item
+	quint64 getTotalItemSize() const;
+	
 	// Get methods
 	int getItemCount() const { return items.size(); }
 	int getDiskCount() const { return disks.size(); }

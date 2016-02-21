@@ -34,10 +34,12 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(ui.actionAbout, SIGNAL(triggered()), this, SLOT(about()));
     QObject::connect(ui.editPath, SIGNAL(textChanged(const QString &)), this, SLOT(onRootPathChanged()));
     QObject::connect(ui.cboDisks, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentDiskChanged()));
+    QObject::connect(document, SIGNAL(onItemChanged()), this, SLOT(onItemChanged()));
 
-    ui.editPath->setText("/home/danilo/Desktop");
+    //ui.editPath->setText("/home/danilo/Desktop");
 
-    showCentered();
+    showMaximized();
+    //showCentered();
 }
 
 MainWindow::~MainWindow()
@@ -88,6 +90,18 @@ void MainWindow::showCentered()
                 );
 }
 
+void MainWindow::onItemChanged()
+{
+     // Invalidate eventual items distribution
+    removeAllDisks();
+
+    //  Compute the total item size
+    const quint64 totalSize = document->getTotalItemSize();
+
+    // Update the total item size label
+    ui.lblTotalSize->setText(FSUtils::formatSize(totalSize) + ".");
+}
+
 void MainWindow::onRootPathChanged()
 {
     const QString newPath = ui.editPath->text();
@@ -130,6 +144,7 @@ void MainWindow::onCurrentDiskChanged()
 void MainWindow::on_btnAddItem_clicked()
 {
     const QModelIndexList indexes = ui.treeFileSystem->selectionModel()->selectedRows();
+    statusBar()->showMessage(tr("Computing size..."));
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     // Create the new item
@@ -140,12 +155,14 @@ void MainWindow::on_btnAddItem_clicked()
         item->addEntry(entryFromIndex(index));
 
     QApplication::restoreOverrideCursor();
+    statusBar()->clearMessage();
     addItem(item);
 }
 
 void MainWindow::on_btnAddItemSeparate_clicked()
 {
     const QModelIndexList indexes = ui.treeFileSystem->selectionModel()->selectedRows();
+    statusBar()->showMessage(tr("Computing size..."));
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
     QList<Item *> newItems;
@@ -166,6 +183,7 @@ void MainWindow::on_btnAddItemSeparate_clicked()
         addItem(item);
 
     QApplication::restoreOverrideCursor();
+    statusBar()->clearMessage();
 }
 
 void MainWindow::on_btnRemoveItem_clicked()
@@ -227,6 +245,10 @@ void MainWindow::on_actionComputeDisks_triggered()
 
     delete solver;
 
+    // Select the first disk by default
+    if (ui.cboDisks->count() > 0)
+        ui.cboDisks->setCurrentIndex(0);
+
     statusBar()->showMessage(tr("Done (%1 disks created).").arg(document->getDiskCount()));
 }
 
@@ -271,9 +293,6 @@ Item::ItemEntry *MainWindow::entryFromIndex(const QModelIndex &index) const
 
 void MainWindow::removeItems(const QList<Item *> &itemsToRemove)
 {
-    // Invalidate eventual items distribution
-    removeAllDisks();
-
     // Remove the detail view
     itemDetailsModel->setItem(NULL);
 
@@ -286,9 +305,6 @@ void MainWindow::removeItems(const QList<Item *> &itemsToRemove)
 
 void MainWindow::removeCurrentItem()
 {
-    // Invalidate eventual items distribution
-    removeAllDisks();
-
     Item *item = itemDetailsModel->getItem();
     
     // Remove the detail view
@@ -303,9 +319,6 @@ void MainWindow::removeCurrentItem()
 
 void MainWindow::addItem(Item *item)
 {
-    // Invalidate eventual items distribution
-    removeAllDisks();
-
     // Add the item to the document
     document->addItem(item);
 
@@ -315,9 +328,6 @@ void MainWindow::addItem(Item *item)
 
 void MainWindow::removeEntriesFromCurrentItem(const QList<Item::ItemEntry *> &itemsToRemove)
 {
-    // Invalidate eventual items distribution
-    removeAllDisks();
-
     Item *item = itemDetailsModel->getItem();
     item->removeEntries(itemsToRemove);
 

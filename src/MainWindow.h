@@ -52,6 +52,7 @@ protected:
 	void removeAllDisks();
 
 protected slots:
+	void onItemChanged();
 	void onRootPathChanged();
 	void onTreeFSSelectionChanged();
 	void onItemsSelectionChanged();

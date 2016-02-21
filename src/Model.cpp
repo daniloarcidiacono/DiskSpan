@@ -84,3 +84,12 @@ void Model::removeDisks()
 	disks.clear();
 	emit onDiskChanged();
 }
+
+quint64 Model::getTotalItemSize() const
+{
+	quint64 totalSize = 0;
+	foreach (Item *item, items)
+        totalSize += item->getTotalSize();
+
+    return totalSize;
+}
