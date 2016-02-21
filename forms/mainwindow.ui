@@ -379,6 +379,10 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionQuit">
+   <property name="icon">
+    <iconset resource="../resources/application.qrc">
+     <normaloff>:/quit.png</normaloff>:/quit.png</iconset>
+   </property>
    <property name="text">
     <string>&amp;Quit</string>
    </property>
@@ -412,6 +416,8 @@
   <tabstop>editPath</tabstop>
   <tabstop>treeFileSystem</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/application.qrc"/>
+ </resources>
  <connections/>
 </ui>
