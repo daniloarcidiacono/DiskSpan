@@ -1,6 +1,9 @@
 # Prerequisites
 Qt >= 5.5
 
+# Screenshot
+![DiskSpan](images/DiskSpan.png "DiskSpan tool")
+
 # How to build
 ## Unix (g++)
 qmake
@@ -23,3 +26,7 @@ sudo apt-get install mesa-common-dev
 
 ### /usr/bin/ld: cannot find -lGL
 sudo apt-get install libglu1-mesa-dev
+
+## License
+
+[GNU LGPL license](https://www.openclinica.com/gnu-lgpl-open-source-license)
