@@ -41,12 +41,15 @@ protected:
     void showCentered();    
 
 	// Service methods
+	bool isSolvable() const;
+	quint64 getGlobalDiskCapacity() const;
 	Item::ItemEntry *entryFromIndex(const QModelIndex &index) const;
 	void removeItems(const QList<Item *> &itemsToRemove);
 	void removeCurrentItem();
 	void addItem(Item *item);
 	void removeEntriesFromCurrentItem(const QList<Item::ItemEntry *> &itemsToRemove);
 	void addDisk(Disk *disk);
+	void removeAllDisks();
 
 protected slots:
 	void onRootPathChanged();
@@ -58,8 +61,6 @@ protected slots:
 	void on_btnAddItemSeparate_clicked();
 	void on_btnRemoveItem_clicked();
 	void on_btnRemoveFromItem_clicked();
-	void on_btnAddDisk_clicked();
-	void on_btnRemoveDisk_clicked();
 	void on_actionComputeDisks_triggered();
     void about();
 

@@ -38,7 +38,14 @@ QVariant DiskModel::data(const QModelIndex &index, int role) const
  	if (role == Qt::DisplayRole)
     {    	
     	if (index.column() == 0)
-    		return QString("Disk %1 (%2)").arg(index.row() + 1).arg(FSUtils::formatSize(disk->getCapacity()));
+    	{
+    		const quint64 capacity = disk->getCapacity();
+    		const quint64 usedCapacity = disk->getUsedCapacity();
+    		const double usedPercentage = (double)usedCapacity / capacity * 100;
+    		return QString("Disk %1 (%2, %3% used) ").arg(index.row() + 1)
+    												.arg(FSUtils::formatSize(capacity))
+    												.arg(QString::number(usedPercentage, 'f', 2));
+    	}
     }
 
     return QVariant();	

@@ -31,6 +31,9 @@ public:
 	// Removes all the items
 	void clear();
 
+	// Returns the used capacity of the disk
+	quint64 getUsedCapacity() const;
+
 	// Gets an item
 	Item *getItem(const int index) const { return items.at(index); }
 

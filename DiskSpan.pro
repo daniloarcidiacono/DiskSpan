@@ -15,9 +15,9 @@ RCC_DIR = $$DESTDIR/.qrc
 UI_DIR = $$DESTDIR/.ui
 
 # Input
-HEADERS += src/MainWindow.h src/mulknap.h src/Model.h src/Item.h src/Disk.h src/ItemsModel.h src/FSUtils.h src/ItemDetailsModel.h src/FSTreeProxyFilter.h src/AddDiskDialog.h src/DiskModel.h src/DiskDetailsModel.h
-FORMS += forms/mainwindow.ui forms/adddiskdialog.ui
-SOURCES += src/main.cpp src/MainWindow.cpp src/mulknap.c src/Model.cpp src/Item.cpp src/Disk.cpp src/ItemsModel.cpp src/ItemDetailsModel.cpp src/FSTreeProxyFilter.cpp src/AddDiskDialog.cpp src/DiskModel.cpp src/DiskDetailsModel.cpp
+HEADERS += src/MainWindow.h src/Model.h src/Item.h src/Disk.h src/ItemsModel.h src/FSUtils.h src/ItemDetailsModel.h src/FSTreeProxyFilter.h src/DiskModel.h src/DiskDetailsModel.h src/BinSolver.h src/BFDSolver.h src/SortUtils.h
+FORMS += forms/mainwindow.ui
+SOURCES += src/main.cpp src/MainWindow.cpp src/Model.cpp src/Item.cpp src/Disk.cpp src/ItemsModel.cpp src/ItemDetailsModel.cpp src/FSTreeProxyFilter.cpp src/DiskModel.cpp src/DiskDetailsModel.cpp src/BFDSolver.cpp
 RESOURCES += resources/application.qrc
 
 QT += widgets

@@ -74,3 +74,13 @@ void Model::removeDisk(Disk *disk)
 	delete disk;
 	emit onDiskChanged();
 }
+
+void Model::removeDisks()
+{	
+	foreach (Disk *disk, disks)
+		QObject::disconnect(disk, SIGNAL(onItemChanged()), this, SIGNAL(onDiskChanged()));
+
+	qDeleteAll(disks);
+	disks.clear();
+	emit onDiskChanged();
+}

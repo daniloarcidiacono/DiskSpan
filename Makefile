@@ -50,16 +50,15 @@ OBJECTS_DIR   = build/debug/.obj/
 
 SOURCES       = src/main.cpp \
 		src/MainWindow.cpp \
-		src/mulknap.c \
 		src/Model.cpp \
 		src/Item.cpp \
 		src/Disk.cpp \
 		src/ItemsModel.cpp \
 		src/ItemDetailsModel.cpp \
 		src/FSTreeProxyFilter.cpp \
-		src/AddDiskDialog.cpp \
 		src/DiskModel.cpp \
-		src/DiskDetailsModel.cpp build/debug/.qrc/qrc_application.cpp \
+		src/DiskDetailsModel.cpp \
+		src/BFDSolver.cpp build/debug/.qrc/qrc_application.cpp \
 		build/debug/.moc/moc_MainWindow.cpp \
 		build/debug/.moc/moc_Model.cpp \
 		build/debug/.moc/moc_Item.cpp \
@@ -67,21 +66,19 @@ SOURCES       = src/main.cpp \
 		build/debug/.moc/moc_ItemsModel.cpp \
 		build/debug/.moc/moc_ItemDetailsModel.cpp \
 		build/debug/.moc/moc_FSTreeProxyFilter.cpp \
-		build/debug/.moc/moc_AddDiskDialog.cpp \
 		build/debug/.moc/moc_DiskModel.cpp \
 		build/debug/.moc/moc_DiskDetailsModel.cpp
 OBJECTS       = build/debug/.obj/main.o \
 		build/debug/.obj/MainWindow.o \
-		build/debug/.obj/mulknap.o \
 		build/debug/.obj/Model.o \
 		build/debug/.obj/Item.o \
 		build/debug/.obj/Disk.o \
 		build/debug/.obj/ItemsModel.o \
 		build/debug/.obj/ItemDetailsModel.o \
 		build/debug/.obj/FSTreeProxyFilter.o \
-		build/debug/.obj/AddDiskDialog.o \
 		build/debug/.obj/DiskModel.o \
 		build/debug/.obj/DiskDetailsModel.o \
+		build/debug/.obj/BFDSolver.o \
 		build/debug/.obj/qrc_application.o \
 		build/debug/.obj/moc_MainWindow.o \
 		build/debug/.obj/moc_Model.o \
@@ -90,7 +87,6 @@ OBJECTS       = build/debug/.obj/main.o \
 		build/debug/.obj/moc_ItemsModel.o \
 		build/debug/.obj/moc_ItemDetailsModel.o \
 		build/debug/.obj/moc_FSTreeProxyFilter.o \
-		build/debug/.obj/moc_AddDiskDialog.o \
 		build/debug/.obj/moc_DiskModel.o \
 		build/debug/.obj/moc_DiskDetailsModel.o
 DIST          = /opt/Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
@@ -227,7 +223,6 @@ DIST          = /opt/Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		/opt/Qt/5.5/gcc_64/mkspecs/features/yacc.prf \
 		/opt/Qt/5.5/gcc_64/mkspecs/features/lex.prf \
 		DiskSpan.pro src/MainWindow.h \
-		src/mulknap.h \
 		src/Model.h \
 		src/Item.h \
 		src/Disk.h \
@@ -235,20 +230,21 @@ DIST          = /opt/Qt/5.5/gcc_64/mkspecs/features/spec_pre.prf \
 		src/FSUtils.h \
 		src/ItemDetailsModel.h \
 		src/FSTreeProxyFilter.h \
-		src/AddDiskDialog.h \
 		src/DiskModel.h \
-		src/DiskDetailsModel.h src/main.cpp \
+		src/DiskDetailsModel.h \
+		src/BinSolver.h \
+		src/BFDSolver.h \
+		src/SortUtils.h src/main.cpp \
 		src/MainWindow.cpp \
-		src/mulknap.c \
 		src/Model.cpp \
 		src/Item.cpp \
 		src/Disk.cpp \
 		src/ItemsModel.cpp \
 		src/ItemDetailsModel.cpp \
 		src/FSTreeProxyFilter.cpp \
-		src/AddDiskDialog.cpp \
 		src/DiskModel.cpp \
-		src/DiskDetailsModel.cpp
+		src/DiskDetailsModel.cpp \
+		src/BFDSolver.cpp
 QMAKE_TARGET  = DiskSpan
 DESTDIR       = build/debug/#avoid trailing-slash linebreak
 TARGET        = build/debug/DiskSpan
@@ -276,7 +272,7 @@ first: all
 
 ####### Build rules
 
-$(TARGET): build/debug/.ui/ui_mainwindow.h build/debug/.ui/ui_adddiskdialog.h $(OBJECTS)  
+$(TARGET): build/debug/.ui/ui_mainwindow.h $(OBJECTS)  
 	@test -d build/debug/ || mkdir -p build/debug/
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
@@ -572,9 +568,9 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents resources/application.qrc $(DISTDIR)/
-	$(COPY_FILE) --parents src/MainWindow.h src/mulknap.h src/Model.h src/Item.h src/Disk.h src/ItemsModel.h src/FSUtils.h src/ItemDetailsModel.h src/FSTreeProxyFilter.h src/AddDiskDialog.h src/DiskModel.h src/DiskDetailsModel.h $(DISTDIR)/
-	$(COPY_FILE) --parents src/main.cpp src/MainWindow.cpp src/mulknap.c src/Model.cpp src/Item.cpp src/Disk.cpp src/ItemsModel.cpp src/ItemDetailsModel.cpp src/FSTreeProxyFilter.cpp src/AddDiskDialog.cpp src/DiskModel.cpp src/DiskDetailsModel.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents forms/mainwindow.ui forms/adddiskdialog.ui $(DISTDIR)/
+	$(COPY_FILE) --parents src/MainWindow.h src/Model.h src/Item.h src/Disk.h src/ItemsModel.h src/FSUtils.h src/ItemDetailsModel.h src/FSTreeProxyFilter.h src/DiskModel.h src/DiskDetailsModel.h src/BinSolver.h src/BFDSolver.h src/SortUtils.h $(DISTDIR)/
+	$(COPY_FILE) --parents src/main.cpp src/MainWindow.cpp src/Model.cpp src/Item.cpp src/Disk.cpp src/ItemsModel.cpp src/ItemDetailsModel.cpp src/FSTreeProxyFilter.cpp src/DiskModel.cpp src/DiskDetailsModel.cpp src/BFDSolver.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents forms/mainwindow.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -607,9 +603,9 @@ build/debug/.qrc/qrc_application.cpp: resources/application.qrc \
 		resources/paste.png
 	/opt/Qt/5.5/gcc_64/bin/rcc -name application resources/application.qrc -o build/debug/.qrc/qrc_application.cpp
 
-compiler_moc_header_make_all: build/debug/.moc/moc_MainWindow.cpp build/debug/.moc/moc_Model.cpp build/debug/.moc/moc_Item.cpp build/debug/.moc/moc_Disk.cpp build/debug/.moc/moc_ItemsModel.cpp build/debug/.moc/moc_ItemDetailsModel.cpp build/debug/.moc/moc_FSTreeProxyFilter.cpp build/debug/.moc/moc_AddDiskDialog.cpp build/debug/.moc/moc_DiskModel.cpp build/debug/.moc/moc_DiskDetailsModel.cpp
+compiler_moc_header_make_all: build/debug/.moc/moc_MainWindow.cpp build/debug/.moc/moc_Model.cpp build/debug/.moc/moc_Item.cpp build/debug/.moc/moc_Disk.cpp build/debug/.moc/moc_ItemsModel.cpp build/debug/.moc/moc_ItemDetailsModel.cpp build/debug/.moc/moc_FSTreeProxyFilter.cpp build/debug/.moc/moc_DiskModel.cpp build/debug/.moc/moc_DiskDetailsModel.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) build/debug/.moc/moc_MainWindow.cpp build/debug/.moc/moc_Model.cpp build/debug/.moc/moc_Item.cpp build/debug/.moc/moc_Disk.cpp build/debug/.moc/moc_ItemsModel.cpp build/debug/.moc/moc_ItemDetailsModel.cpp build/debug/.moc/moc_FSTreeProxyFilter.cpp build/debug/.moc/moc_AddDiskDialog.cpp build/debug/.moc/moc_DiskModel.cpp build/debug/.moc/moc_DiskDetailsModel.cpp
+	-$(DEL_FILE) build/debug/.moc/moc_MainWindow.cpp build/debug/.moc/moc_Model.cpp build/debug/.moc/moc_Item.cpp build/debug/.moc/moc_Disk.cpp build/debug/.moc/moc_ItemsModel.cpp build/debug/.moc/moc_ItemDetailsModel.cpp build/debug/.moc/moc_FSTreeProxyFilter.cpp build/debug/.moc/moc_DiskModel.cpp build/debug/.moc/moc_DiskDetailsModel.cpp
 build/debug/.moc/moc_MainWindow.cpp: /opt/Qt/5.5/gcc_64/include/QtWidgets/QMainWindow \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/qmainwindow.h \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
@@ -743,6 +739,8 @@ build/debug/.moc/moc_MainWindow.cpp: /opt/Qt/5.5/gcc_64/include/QtWidgets/QMainW
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
 		/opt/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/opt/Qt/5.5/gcc_64/include/QtWidgets/QDoubleSpinBox \
+		/opt/Qt/5.5/gcc_64/include/QtWidgets/qspinbox.h \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/QGroupBox \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/qgroupbox.h \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/QHBoxLayout \
@@ -1184,160 +1182,6 @@ build/debug/.moc/moc_FSTreeProxyFilter.cpp: /opt/Qt/5.5/gcc_64/include/QtCore/QS
 		src/FSTreeProxyFilter.h
 	/opt/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/opt/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/danilo/dnl/DiskSpan -I/home/danilo/dnl/DiskSpan -I/opt/Qt/5.5/gcc_64/include -I/opt/Qt/5.5/gcc_64/include/QtWidgets -I/opt/Qt/5.5/gcc_64/include/QtGui -I/opt/Qt/5.5/gcc_64/include/QtCore src/FSTreeProxyFilter.h -o build/debug/.moc/moc_FSTreeProxyFilter.cpp
 
-build/debug/.moc/moc_AddDiskDialog.cpp: build/debug/.ui/ui_adddiskdialog.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/QVariant \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qvariant.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qglobal.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qconfig.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qfeatures.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qsystemdetection.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qprocessordetection.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qcompilerdetection.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qtypeinfo.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qtypetraits.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qsysinfo.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qlogging.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qflags.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qglobalstatic.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qmutex.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qnumeric.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qbasicatomic.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qgenericatomic.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_cxx11.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_gcc.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_msvc.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_armv7.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_armv6.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_armv5.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_ia64.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_mips.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_x86.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_unix.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qbytearray.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qrefcount.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qnamespace.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qarraydata.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qstring.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qchar.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qstringbuilder.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qlist.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qalgorithms.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qiterator.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qbytearraylist.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qstringlist.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qregexp.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qstringmatcher.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qmetatype.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qvarlengtharray.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qcontainerfwd.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qisenum.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qobjectdefs.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qmap.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qpair.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qdebug.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qhash.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qtextstream.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qiodevice.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qobject.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qcoreevent.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qscopedpointer.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qobject_impl.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qlocale.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qshareddata.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qvector.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qpoint.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qset.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QAction \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qaction.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qkeysequence.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qwindowdefs_win.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qmargins.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qpaintdevice.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qrect.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qsize.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qpalette.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qcolor.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qrgb.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qbrush.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qmatrix.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qpolygon.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qregion.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qdatastream.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qline.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qtransform.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qpainterpath.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qimage.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qpixelformat.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qpixmap.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qsharedpointer.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qsharedpointer_impl.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qfont.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qfontmetrics.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qfontinfo.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qsizepolicy.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qcursor.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qevent.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qurl.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qurlquery.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qfile.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qicon.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qactiongroup.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QApplication \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qapplication.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qcoreapplication.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qeventloop.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qdesktopwidget.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qguiapplication.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qinputmethod.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QButtonGroup \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qbuttongroup.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QComboBox \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qcombobox.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QDialog \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qdialog.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QDialogButtonBox \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qdialogbuttonbox.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QDoubleSpinBox \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qspinbox.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QHBoxLayout \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qboxlayout.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qlayout.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qlayoutitem.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qgridlayout.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QLabel \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qlabel.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QSpacerItem \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QVBoxLayout \
-		src/AddDiskDialog.h
-	/opt/Qt/5.5/gcc_64/bin/moc $(DEFINES) -I/opt/Qt/5.5/gcc_64/mkspecs/linux-g++ -I/home/danilo/dnl/DiskSpan -I/home/danilo/dnl/DiskSpan -I/opt/Qt/5.5/gcc_64/include -I/opt/Qt/5.5/gcc_64/include/QtWidgets -I/opt/Qt/5.5/gcc_64/include/QtGui -I/opt/Qt/5.5/gcc_64/include/QtCore src/AddDiskDialog.h -o build/debug/.moc/moc_AddDiskDialog.cpp
-
 build/debug/.moc/moc_DiskModel.cpp: /opt/Qt/5.5/gcc_64/include/QtCore/QAbstractListModel \
 		/opt/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
 		/opt/Qt/5.5/gcc_64/include/QtCore/qvariant.h \
@@ -1480,14 +1324,11 @@ build/debug/.moc/moc_DiskDetailsModel.cpp: /opt/Qt/5.5/gcc_64/include/QtCore/QAb
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: build/debug/.ui/ui_mainwindow.h build/debug/.ui/ui_adddiskdialog.h
+compiler_uic_make_all: build/debug/.ui/ui_mainwindow.h
 compiler_uic_clean:
-	-$(DEL_FILE) build/debug/.ui/ui_mainwindow.h build/debug/.ui/ui_adddiskdialog.h
+	-$(DEL_FILE) build/debug/.ui/ui_mainwindow.h
 build/debug/.ui/ui_mainwindow.h: forms/mainwindow.ui
 	/opt/Qt/5.5/gcc_64/bin/uic forms/mainwindow.ui -o build/debug/.ui/ui_mainwindow.h
-
-build/debug/.ui/ui_adddiskdialog.h: forms/adddiskdialog.ui
-	/opt/Qt/5.5/gcc_64/bin/uic forms/adddiskdialog.ui -o build/debug/.ui/ui_adddiskdialog.h
 
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
@@ -1633,6 +1474,8 @@ build/debug/.obj/main.o: src/main.cpp /opt/Qt/5.5/gcc_64/include/QtWidgets/QAppl
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
 		/opt/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
+		/opt/Qt/5.5/gcc_64/include/QtWidgets/QDoubleSpinBox \
+		/opt/Qt/5.5/gcc_64/include/QtWidgets/qspinbox.h \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/QGroupBox \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/qgroupbox.h \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/QHBoxLayout \
@@ -2130,6 +1973,7 @@ build/debug/.obj/MainWindow.o: src/MainWindow.cpp /opt/Qt/5.5/gcc_64/include/QtW
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/QApplication \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/QButtonGroup \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/QComboBox \
+		/opt/Qt/5.5/gcc_64/include/QtWidgets/QDoubleSpinBox \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/QGroupBox \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/QHBoxLayout \
 		/opt/Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
@@ -2152,22 +1996,17 @@ build/debug/.obj/MainWindow.o: src/MainWindow.cpp /opt/Qt/5.5/gcc_64/include/QtW
 		src/ItemDetailsModel.h \
 		src/FSTreeProxyFilter.h \
 		/opt/Qt/5.5/gcc_64/include/QtCore/QSortFilterProxyModel \
-		src/AddDiskDialog.h \
-		build/debug/.ui/ui_adddiskdialog.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QDialog \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QDialogButtonBox \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QDoubleSpinBox \
 		src/FSUtils.h \
 		/opt/Qt/5.5/gcc_64/include/QtCore/QDir \
 		src/Disk.h \
 		src/DiskModel.h \
 		/opt/Qt/5.5/gcc_64/include/QtCore/QAbstractListModel \
 		src/DiskDetailsModel.h \
-		src/mulknap.h
+		src/BFDSolver.h \
+		src/BinSolver.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/QtGlobal \
+		/opt/Qt/5.5/gcc_64/include/QtCore/QMap
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/debug/.obj/MainWindow.o src/MainWindow.cpp
-
-build/debug/.obj/mulknap.o: src/mulknap.c 
-	$(CC) -c $(CFLAGS) $(INCPATH) -o build/debug/.obj/mulknap.o src/mulknap.c
 
 build/debug/.obj/Model.o: src/Model.cpp src/Model.h \
 		/opt/Qt/5.5/gcc_64/include/QtCore/QObject \
@@ -2632,165 +2471,6 @@ build/debug/.obj/FSTreeProxyFilter.o: src/FSTreeProxyFilter.cpp src/FSTreeProxyF
 		/opt/Qt/5.5/gcc_64/include/QtCore/QtDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/debug/.obj/FSTreeProxyFilter.o src/FSTreeProxyFilter.cpp
 
-build/debug/.obj/AddDiskDialog.o: src/AddDiskDialog.cpp src/AddDiskDialog.h \
-		build/debug/.ui/ui_adddiskdialog.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/QVariant \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qvariant.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qglobal.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qconfig.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qfeatures.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qsystemdetection.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qprocessordetection.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qcompilerdetection.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qtypeinfo.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qtypetraits.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qsysinfo.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qlogging.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qflags.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qglobalstatic.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qmutex.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qnumeric.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qbasicatomic.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qgenericatomic.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_cxx11.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_gcc.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_msvc.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_armv7.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_armv6.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_armv5.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_ia64.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_mips.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_x86.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_unix.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qbytearray.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qrefcount.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qnamespace.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qarraydata.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qstring.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qchar.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qstringbuilder.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qlist.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qalgorithms.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qiterator.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qbytearraylist.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qstringlist.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qregexp.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qstringmatcher.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qmetatype.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qvarlengtharray.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qcontainerfwd.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qisenum.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qobjectdefs.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qmap.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qpair.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qdebug.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qhash.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qtextstream.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qiodevice.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qobject.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qcoreevent.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qscopedpointer.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qobject_impl.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qlocale.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qshareddata.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qvector.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qpoint.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qset.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QAction \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qaction.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qkeysequence.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qwidget.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qwindowdefs.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qwindowdefs_win.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qmargins.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qpaintdevice.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qrect.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qsize.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qpalette.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qcolor.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qrgb.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qbrush.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qmatrix.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qpolygon.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qregion.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qdatastream.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qline.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qtransform.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qpainterpath.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qimage.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qpixelformat.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qpixmap.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qsharedpointer.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qsharedpointer_impl.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qfont.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qfontmetrics.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qfontinfo.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qsizepolicy.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qcursor.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qevent.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qurl.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qurlquery.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qfile.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qfiledevice.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qvector2d.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qtouchdevice.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qicon.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qactiongroup.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QApplication \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qapplication.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qcoreapplication.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qeventloop.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qdesktopwidget.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qguiapplication.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qinputmethod.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QButtonGroup \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qbuttongroup.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QComboBox \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qcombobox.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qstyleoption.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qabstractspinbox.h \
-		/opt/Qt/5.5/gcc_64/include/QtGui/qvalidator.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qregularexpression.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qslider.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qabstractslider.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qstyle.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qtabbar.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qtabwidget.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qrubberband.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qframe.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QDialog \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qdialog.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QDialogButtonBox \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qdialogbuttonbox.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QDoubleSpinBox \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qspinbox.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QHBoxLayout \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qboxlayout.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qlayout.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qlayoutitem.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qgridlayout.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QHeaderView \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qheaderview.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qabstractitemview.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qabstractscrollarea.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qitemselectionmodel.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QLabel \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/qlabel.h \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QSpacerItem \
-		/opt/Qt/5.5/gcc_64/include/QtWidgets/QVBoxLayout \
-		src/FSUtils.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/QFileInfo \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qfileinfo.h \
-		/opt/Qt/5.5/gcc_64/include/QtCore/QDir \
-		/opt/Qt/5.5/gcc_64/include/QtCore/qdir.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/debug/.obj/AddDiskDialog.o src/AddDiskDialog.cpp
-
 build/debug/.obj/DiskModel.o: src/DiskModel.cpp src/DiskModel.h \
 		/opt/Qt/5.5/gcc_64/include/QtCore/QAbstractListModel \
 		/opt/Qt/5.5/gcc_64/include/QtCore/qabstractitemmodel.h \
@@ -2955,6 +2635,80 @@ build/debug/.obj/DiskDetailsModel.o: src/DiskDetailsModel.cpp src/DiskDetailsMod
 		/opt/Qt/5.5/gcc_64/include/QtCore/QDebug
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/debug/.obj/DiskDetailsModel.o src/DiskDetailsModel.cpp
 
+build/debug/.obj/BFDSolver.o: src/BFDSolver.cpp src/BFDSolver.h \
+		src/BinSolver.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/QtGlobal \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qglobal.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qconfig.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qfeatures.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qsystemdetection.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qprocessordetection.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qcompilerdetection.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qtypeinfo.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qtypetraits.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qsysinfo.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qlogging.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qflags.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qbasicatomic.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qgenericatomic.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_gcc.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_msvc.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_armv7.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_armv6.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_armv5.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_ia64.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_mips.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_x86.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qatomic_unix.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qglobalstatic.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qmutex.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qnumeric.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/QList \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qlist.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qalgorithms.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qiterator.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qrefcount.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qarraydata.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qbytearraylist.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qbytearray.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qnamespace.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qstring.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qchar.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qstringbuilder.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qstringlist.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qregexp.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qstringmatcher.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/QMap \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qmap.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qpair.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qdebug.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qhash.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qtextstream.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qiodevice.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qobject.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qobjectdefs.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qcoreevent.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qscopedpointer.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qmetatype.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qvarlengtharray.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qcontainerfwd.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qisenum.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qobject_impl.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qlocale.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qvariant.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qshareddata.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qvector.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qpoint.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qset.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/qcontiguouscache.h \
+		src/SortUtils.h \
+		/opt/Qt/5.5/gcc_64/include/QtCore/QtAlgorithms
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/debug/.obj/BFDSolver.o src/BFDSolver.cpp
+
 build/debug/.obj/qrc_application.o: build/debug/.qrc/qrc_application.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/debug/.obj/qrc_application.o build/debug/.qrc/qrc_application.cpp
 
@@ -2978,9 +2732,6 @@ build/debug/.obj/moc_ItemDetailsModel.o: build/debug/.moc/moc_ItemDetailsModel.c
 
 build/debug/.obj/moc_FSTreeProxyFilter.o: build/debug/.moc/moc_FSTreeProxyFilter.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/debug/.obj/moc_FSTreeProxyFilter.o build/debug/.moc/moc_FSTreeProxyFilter.cpp
-
-build/debug/.obj/moc_AddDiskDialog.o: build/debug/.moc/moc_AddDiskDialog.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/debug/.obj/moc_AddDiskDialog.o build/debug/.moc/moc_AddDiskDialog.cpp
 
 build/debug/.obj/moc_DiskModel.o: build/debug/.moc/moc_DiskModel.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/debug/.obj/moc_DiskModel.o build/debug/.moc/moc_DiskModel.cpp

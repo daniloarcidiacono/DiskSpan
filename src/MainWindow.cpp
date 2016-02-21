@@ -3,22 +3,16 @@
 #include <QDesktopWidget>
 #include <QTextStream>
 #include <QDebug>
-#include <QtAlgorithms>
 #include "MainWindow.h"
 #include "Model.h"
 #include "ItemsModel.h"
 #include "ItemDetailsModel.h"
 #include "FSTreeProxyFilter.h"
-#include "AddDiskDialog.h"
 #include "FSUtils.h"
 #include "Disk.h"
 #include "DiskModel.h"
 #include "DiskDetailsModel.h"
-
-extern "C"
-{
-    #include "mulknap.h"
-}
+#include "BFDSolver.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -128,7 +122,7 @@ void MainWindow::onItemDetailsSelectionChanged()
 void MainWindow::onCurrentDiskChanged()
 {    
     const int index = ui.cboDisks->currentIndex();    
-    ui.btnRemoveDisk->setEnabled(index != -1);
+    //ui.btnRemoveDisk->setEnabled(index != -1);
     if (index != -1)
         diskDetailsModel->setDisk(document->getDisk(index));
 }
@@ -154,6 +148,8 @@ void MainWindow::on_btnAddItemSeparate_clicked()
     const QModelIndexList indexes = ui.treeFileSystem->selectionModel()->selectedRows();
     QApplication::setOverrideCursor(Qt::WaitCursor);
 
+    QList<Item *> newItems;
+
     // Build the individual entries
     foreach (QModelIndex index, indexes)
     {
@@ -161,8 +157,13 @@ void MainWindow::on_btnAddItemSeparate_clicked()
         Item *item = new Item();
         item->addEntry(entryFromIndex(index));
 
-        addItem(item);
+        // Collect it
+        newItems.push_back(item);
     }
+
+    // Add
+    foreach (Item *item, newItems)
+        addItem(item);
 
     QApplication::restoreOverrideCursor();
 }
@@ -192,115 +193,71 @@ void MainWindow::on_btnRemoveFromItem_clicked()
     removeEntriesFromCurrentItem(itemsToRemove);
 }
 
-void MainWindow::on_btnAddDisk_clicked()
-{
-    AddDiskDialog *dlg = new AddDiskDialog(this);
-
-    switch (dlg->exec())
-    {
-        case QDialog::Accepted:
-        {
-            Disk *disk = new Disk(dlg->getCapacity());
-            addDisk(disk);
-            break;
-        }
-    }
-}
-
-void MainWindow::on_btnRemoveDisk_clicked()
-{
-}
-
-/*
-template<typename T> class CompareIndicesByAnotherVectorValues
-{ 
-    T *values;
-
-public: 
-    CompareIndicesByAnotherVectorValues(T *_values)
-        : values(_values)
-    {
-    } 
-
-    bool operator()(const int &a, const int &b) const
-    { 
-        return (values)[a] > (values)[b]; 
-    } 
-}; 
-
-template <typename T> int *sort_indexes(T *v, const int vSize)
-{
-    // initialize original index locations
-    int *idx = new int[vSize];
-
-    for (int i = 0; i != vSize; i++)
-        idx[i] = i;
-
-    // sort indexes based on comparing values in v
-    sort(idx.begin(), idx.end(), CompareIndicesByAnotherVectorValues<int>(v));
-
-    return idx;
-}*/
-
 void MainWindow::on_actionComputeDisks_triggered()
 {
-    /*
-    n: numero di oggetti
-    m: numero di zaini
-    p: profitto per oggetto (interi positivi)
-    w: peso per oggetto (interi positivi)
-    c: capacità per zaino (interi positivi)
-    x: risultati*/
-
-    const int n = document->getItemCount();
-    const int m = document->getDiskCount();
-    int *p = new int[n];
-    int *w = p;
-    int *c = new int[m];
-    int *x = new int[n];
-    
-    for (int i = 0; i < n; i++)
-        p[i] = document->getItem(i)->getTotalSize();
-
-    for (int i = 0; i < m; i++)
-        c[i] = document->getDisk(i)->getCapacity();
-
-    const int *cIndexes = sort_indexes(c, m);
-
-    qDebug() << "Before invoking mulknap..." << endl;
-    
-    //qSort(list.begin(), list.end(), CompareIndicesByAnotherVectorValues<int>(c));
-
-    QApplication::setOverrideCursor(Qt::WaitCursor);   
-    mulknap(n, m, p, w, x, c);
-    QApplication::restoreOverrideCursor();
-
-    for (int i = 0; i < m; i++)
-        document->getDisk(i)->clear();
-
-    for (int i = 0; i < n; i++)
+    if (!isSolvable())
     {
-        qDebug() << QString("x[%1] = %2").arg(i).arg(x[i]) << endl;
-
-        // i: indice item
-        // x[i]: indice disco
-        Item *item = document->getItem(i);
-        Disk *disk = document->getDisk(x[i]);
-        disk->addItem(item);
+        QMessageBox::critical(this, tr("Error"), tr("Every item's size must be less or equal than the disk capacity!"));    
+        return;
     }
 
-    delete []p;
-    delete []c;
-    delete []x;
-    //delete []cIndexes;
+    statusBar()->showMessage(tr("Distributing items..."));
+
+    BinSolver *solver = new BFDSolver();
+
+    // Init the solver
+    const quint64 capacity = getGlobalDiskCapacity();
+    solver->setDiskCapacity(capacity);
+    for (int i = 0; i < document->getItemCount(); i++)
+        solver->addItem(document->getItem(i)->getTotalSize());
+
+    // Solve
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    solver->solve();
+    QApplication::restoreOverrideCursor();
+
+    // Setup results
+    removeAllDisks();
+
+    for (int i = 0; i < solver->getDiskCount(); i++)
+        addDisk(new Disk(capacity));
+
+    for (int i = 0; i < document->getItemCount(); i++)
+        document->getDisk(solver->getItemAssignment(i))->addItem(document->getItem(i));
+
+    delete solver;
+
+    statusBar()->showMessage(tr("Done (%1 disks created).").arg(document->getDiskCount()));
 }
 
 void MainWindow::about()
 {
    QMessageBox::about(this, tr("About DiskSpan"),
-            tr("The <b>DiskSpan</b> example demonstrates how to "
-               "write modern GUI applications using Qt, with a menu bar, "
-               "toolbars, and a status bar."));
+            tr("<b>DiskSpan</b> v0.1.0 by Danilo Arcidiacono<br>"
+               "<a href=\"mailto:danilo.arcidiacono@gmail.com\">danilo.arcidiacono@gmail.com</a><br>"
+               "<a href=\"https://github.com/daniloarcidiacono\">Github</a>"));
+}
+
+bool MainWindow::isSolvable() const
+{
+    const quint64 capacity = getGlobalDiskCapacity();
+
+    // Check if every item has capacity less than the disk size
+    for (int i = 0; i < document->getItemCount(); i++)
+        if (document->getItem(i)->getTotalSize() > capacity)
+            return false;
+
+    return true;
+}
+
+quint64 MainWindow::getGlobalDiskCapacity() const
+{
+    if (ui.cboUnit->currentIndex() == 0) return ui.spinCapacity->value() * 1;
+    if (ui.cboUnit->currentIndex() == 1) return ui.spinCapacity->value() * FSUtils::KB;
+    if (ui.cboUnit->currentIndex() == 2) return ui.spinCapacity->value() * FSUtils::MB;
+    if (ui.cboUnit->currentIndex() == 3) return ui.spinCapacity->value() * FSUtils::GB;
+
+    return 0;
 }
 
 Item::ItemEntry *MainWindow::entryFromIndex(const QModelIndex &index) const
@@ -314,6 +271,9 @@ Item::ItemEntry *MainWindow::entryFromIndex(const QModelIndex &index) const
 
 void MainWindow::removeItems(const QList<Item *> &itemsToRemove)
 {
+    // Invalidate eventual items distribution
+    removeAllDisks();
+
     // Remove the detail view
     itemDetailsModel->setItem(NULL);
 
@@ -326,6 +286,9 @@ void MainWindow::removeItems(const QList<Item *> &itemsToRemove)
 
 void MainWindow::removeCurrentItem()
 {
+    // Invalidate eventual items distribution
+    removeAllDisks();
+
     Item *item = itemDetailsModel->getItem();
     
     // Remove the detail view
@@ -340,6 +303,9 @@ void MainWindow::removeCurrentItem()
 
 void MainWindow::addItem(Item *item)
 {
+    // Invalidate eventual items distribution
+    removeAllDisks();
+
     // Add the item to the document
     document->addItem(item);
 
@@ -349,6 +315,9 @@ void MainWindow::addItem(Item *item)
 
 void MainWindow::removeEntriesFromCurrentItem(const QList<Item::ItemEntry *> &itemsToRemove)
 {
+    // Invalidate eventual items distribution
+    removeAllDisks();
+
     Item *item = itemDetailsModel->getItem();
     item->removeEntries(itemsToRemove);
 
@@ -362,4 +331,11 @@ void MainWindow::removeEntriesFromCurrentItem(const QList<Item::ItemEntry *> &it
 void MainWindow::addDisk(Disk *disk)
 {
     document->addDisk(disk);
+}
+
+void MainWindow::removeAllDisks()
+{
+    diskDetailsModel->setDisk(NULL);
+    document->removeDisks();
+    ui.tblDisk->selectionModel()->clearSelection();
 }

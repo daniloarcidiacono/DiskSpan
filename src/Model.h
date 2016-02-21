@@ -40,6 +40,7 @@ public:
 	void removeItem(Item *item);
 	void removeItems(const QList<Item *> itemsToRemove);
 	void removeDisk(Disk *disk);
+	void removeDisks();
 	
 	// Gets an item
 	Item *getItem(const int index) const { return items.at(index); }
