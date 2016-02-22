@@ -27,7 +27,10 @@ Model::Model(QObject *parent)
 
 Model::~Model()
 {
-	reset();
+	qDeleteAll(items);
+	qDeleteAll(disks);
+
+	//reset();
 }
 
 void Model::reset()
@@ -89,26 +92,29 @@ void Model::addDisks(const QList<Disk *> &newItems)
 void Model::removeItem(Item *item)
 {
 	QObject::disconnect(item, SIGNAL(onEntryChanged()), this, SIGNAL(onItemChanged()));
+	emit beforeRemovingItem(item);
 	items.removeAll(item);
 	delete item;
 	emit onItemChanged();
 }
 
 void Model::removeItems(const QList<Item *> itemsToRemove)
-{
+{	
 	foreach (Item *item, itemsToRemove)
 	{
 		QObject::disconnect(item, SIGNAL(onEntryChanged()), this, SIGNAL(onItemChanged()));
-		items.removeAll(item);
-		delete item;
+		emit beforeRemovingItem(item);
 	}
-
+	
+	qDeleteAll(items);
+	items.clear();
 	emit onItemChanged();
 }
 
 void Model::removeDisk(Disk *disk)
 {
 	QObject::disconnect(disk, SIGNAL(onItemChanged()), this, SIGNAL(onDiskChanged()));
+	emit beforeRemovingDisk(disk);
 	disks.removeAll(disk);
 	delete disk;
 	emit onDiskChanged();
@@ -117,7 +123,10 @@ void Model::removeDisk(Disk *disk)
 void Model::removeDisks()
 {	
 	foreach (Disk *disk, disks)
+	{
 		QObject::disconnect(disk, SIGNAL(onItemChanged()), this, SIGNAL(onDiskChanged()));
+		emit beforeRemovingDisk(disk);
+	}
 
 	qDeleteAll(disks);
 	disks.clear();

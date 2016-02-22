@@ -41,7 +41,9 @@ private:
 signals:
 	void onItemChanged();
 	void onDiskChanged();
-
+	void beforeRemovingItem(const Item *it);
+	void beforeRemovingDisk(const Disk *ds);
+	
 public:
 	Model(QObject *parent = 0);
 	virtual ~Model();

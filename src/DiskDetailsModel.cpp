@@ -46,6 +46,12 @@ void DiskDetailsModel::onDiskChanged()
 	endResetModel();
 }
 
+void DiskDetailsModel::onBeforeRemovingDisk(const Disk *ds)
+{
+    if (disk == ds)
+        setDisk(NULL);
+}
+
 int DiskDetailsModel::rowCount(const QModelIndex &parent) const
 {	
 	return disk != NULL ? disk->getItemCount() : 0;

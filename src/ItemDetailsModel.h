@@ -30,7 +30,8 @@ private:
 protected slots:
 	void onEntryChanged();
 	void onItemChanged();
-	
+	void onBeforeRemovingItem(const Item *it);
+
 public:
 	ItemDetailsModel(Item *item, QObject *parent = 0);
 

@@ -48,6 +48,9 @@ void ItemsComponent::setupUi(QWidget *container)
     QObject::connect(ui.tblItemDetails->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(onItemDetailsSelectionChanged()));
     QObject::connect(ui.btnRemoveFromItem, SIGNAL(clicked()), this, SLOT(removeEntriesFromCurrentItem()));
     QObject::connect(document, SIGNAL(onItemChanged()), this, SLOT(updateTotalSizeLabel()));
+
+    // When an item is deleted, we remove it from the details model
+    QObject::connect(document, SIGNAL(beforeRemovingItem(const Item *)), itemDetailsModel, SLOT(onBeforeRemovingItem(const Item *)));
 }
 
 void ItemsComponent::createModels()
@@ -116,6 +119,8 @@ void ItemsComponent::updateTotalSizeLabel()
 {
     // Invalidate eventual items distribution
     //removeAllDisks();
+    //ui.tblItemDetails-
+    //itemDetailsModel->setItem(NULL);
 
     //  Compute the total item size
     const quint64 totalSize = document->getTotalItemSize();

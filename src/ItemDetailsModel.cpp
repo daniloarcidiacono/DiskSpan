@@ -50,6 +50,12 @@ void ItemDetailsModel::onEntryChanged()
 	endResetModel();
 }
 
+void ItemDetailsModel::onBeforeRemovingItem(const Item *it)
+{
+    if (item == it)
+        setItem(NULL);
+}
+
 int ItemDetailsModel::rowCount(const QModelIndex &parent) const
 {	
 	return item != NULL ? item->getEntryCount() : 0;

@@ -120,10 +120,6 @@ void TransferComponent::addSeparatedItems()
 
 void TransferComponent::removeItems()
 {
-
-    // Remove the detail view
-    //itemDetailsModel->setItem(NULL);
-
     // Remove the items
     document->removeItems(currentItems);
 

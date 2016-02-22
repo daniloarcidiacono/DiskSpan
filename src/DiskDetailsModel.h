@@ -32,6 +32,7 @@ private:
 
 protected slots:
 	void onDiskChanged();
+	void onBeforeRemovingDisk(const Disk *ds);
 
 public:
 	DiskDetailsModel(Disk *disk, QObject *parent = 0);

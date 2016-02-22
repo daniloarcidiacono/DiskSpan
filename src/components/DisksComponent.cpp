@@ -45,6 +45,7 @@ void DisksComponent::setupUi(QWidget *container)
 
     // Wiring
     QObject::connect(ui.cboDisks, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentDiskChanged()));
+    QObject::connect(document, SIGNAL(onItemChanged()), this, SLOT(removeAllDisks()));
     QObject::connect(document, SIGNAL(onDiskChanged()), this, SLOT(onDisksChanged()));
 }
 
