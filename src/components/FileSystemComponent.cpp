@@ -20,6 +20,7 @@
 #include <QMainWindow>
 #include <QFileSystemModel>
 #include <QDebug>
+#include <QDesktopServices>
 #include "FileSystemComponent.h"
 #include "../FSTreeProxyFilter.h"
 #include "../model/Model.h"
@@ -52,12 +53,51 @@ void FileSystemComponent::createModels()
 void FileSystemComponent::setupUi(QWidget *container)
 {
     ui.setupUi(container);
+    ui.treeFileSystem->setContextMenuPolicy(Qt::CustomContextMenu);
     ui.editPath->setText("/home/danilo/Desktop");
     createModels();
 
     // Wiring
     QObject::connect(ui.treeFileSystem->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(onTreeFSSelectionChanged()));
-    QObject::connect(ui.editPath, SIGNAL(textChanged(const QString &)), this, SLOT(onRootPathChanged()));    
+    QObject::connect(ui.editPath, SIGNAL(textChanged(const QString &)), this, SLOT(onRootPathChanged()));
+    QObject::connect(ui.treeFileSystem, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showContextMenu(const QPoint &)));
+}
+
+void FileSystemComponent::showContextMenu(const QPoint &pos)
+{
+    const QModelIndex index = ui.treeFileSystem->indexAt(pos);
+    if (index.isValid())
+    {
+        // Build the actions
+        QAction *actionShowInExplorer = new QAction(QIcon(":/open.png"), tr("&Open containing folder..."), NULL);
+        actionShowInExplorer->setStatusTip(tr("Opens the containing folder of the item"));
+        QObject::connect(actionShowInExplorer, SIGNAL(triggered()), this, SLOT(openContainingFolder()));
+
+        // Show the menu
+        // Note: We must map the point to global from the viewport to account for the header.
+        QMenu *menu = new QMenu();
+        menu->addAction(actionShowInExplorer);
+        menu->exec(ui.treeFileSystem->viewport()->mapToGlobal(pos));
+       delete menu;
+    }
+}
+
+void FileSystemComponent::openContainingFolder()
+{
+    const QModelIndex index = ui.treeFileSystem->currentIndex(); 
+    if (index.isValid())
+    {        
+        // TODO: SEGMENTATION FAULT????
+        // Get the file        
+        qDebug() << "Before fileInfo";
+        qDebug() << "row = " << index.row() << ", col = " << index.column();
+        qDebug() << "name = " << model->filePath(index);
+
+        const QFileInfo info = model->fileInfo(index);
+        //qDebug() << info.absoluteDir().path();
+
+        QDesktopServices::openUrl(QUrl::fromLocalFile(info.absoluteDir().path()));
+    }
 }
 
 void FileSystemComponent::onRootPathChanged()

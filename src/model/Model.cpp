@@ -98,16 +98,17 @@ void Model::removeItem(Item *item)
 	emit onItemChanged();
 }
 
-void Model::removeItems(const QList<Item *> itemsToRemove)
+void Model::removeItems(QList<Item *> &itemsToRemove)
 {	
 	foreach (Item *item, itemsToRemove)
 	{
 		QObject::disconnect(item, SIGNAL(onEntryChanged()), this, SIGNAL(onItemChanged()));
 		emit beforeRemovingItem(item);
-	}
-	
-	qDeleteAll(items);
-	items.clear();
+		items.removeAll(item);
+	}	
+
+	qDeleteAll(itemsToRemove);
+	itemsToRemove.clear();
 	emit onItemChanged();
 }
 

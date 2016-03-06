@@ -62,7 +62,7 @@ public:
 
 	// Remove methods
 	void removeItem(Item *item);
-	void removeItems(const QList<Item *> itemsToRemove);
+	void removeItems(QList<Item *> &itemsToRemove);
 	void removeDisk(Disk *disk);
 	void removeDisks();
 

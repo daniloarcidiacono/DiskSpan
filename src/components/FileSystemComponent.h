@@ -54,6 +54,8 @@ private:
 protected slots:
 	void onRootPathChanged();
 	void onTreeFSSelectionChanged();
+	void showContextMenu(const QPoint &pos);
+	void openContainingFolder();
 
 signals:
 	void fileSelected(const QList<QFileInfo> &files);
